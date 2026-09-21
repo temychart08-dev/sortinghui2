@@ -1,1 +1,1376 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <title>Мій мобільний Wishlist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root {
+      --bg: #050509;
+      --bg-alt: #0b0b12;
+      --card: #14141f;
+      --accent: #ffffff;
+      --accent-soft: #a5b4fc;
+      --accent-strong: #6366f1;
+      --danger: #f97373;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+      --border: #27273a;
+      --radius: 14px;
+      --transition: 0.18s ease;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #050509 45%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+    .app {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: rgba(5,5,9,0.96);
+      backdrop-filter: blur(20px);
+    }
+    .app-header {
+      padding: 14px 16px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .app-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .app-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .screen {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 12px 80px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .section-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .stat-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 10px;
+      border: 1px solid var(--border);
+    }
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .stat-value {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .stat-pill {
+      font-size: 10px;
+      color: var(--accent-soft);
+      margin-top: 2px;
+    }
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--text-muted);
+      background: #050509;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition);
+    }
+    .chip.active {
+      background: var(--accent-strong);
+      color: #050509;
+      border-color: transparent;
+      transform: translateY(-1px);
+    }
+    .chip-outline {
+      background: transparent;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .input-label {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+    .input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-alt);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+    }
+    .input::placeholder { color: var(--text-muted); }
+    .input:focus {
+      border-color: var(--accent-soft);
+      box-shadow: 0 0 0 1px rgba(99,102,241,0.4);
+      background: #111827;
+    }
+    select.input {
+      padding-right: 32px;
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, var(--accent-soft) 50%), linear-gradient(135deg, var(--accent-soft) 50%, transparent 50%);
+      background-position: calc(100% - 14px) calc(50% - 3px), calc(100% - 10px) calc(50% - 3px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      background: var(--accent-strong);
+      color: #050509;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+    }
+    .btn-full { width: 100%; }
+    .btn-secondary {
+      background: #050509;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.6);
+    }
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+      opacity: 0.9;
+    }
+    .btn-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      padding: 0;
+      font-size: 18px;
+    }
+    .items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .item-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition), background var(--transition);
+    }
+    .item-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.7);
+      border-color: rgba(255,255,255,0.08);
+      background: #1f2937;
+    }
+    .item-image {
+      width: 72px;
+      height: 72px;
+      border-radius: 12px;
+      background: #050509;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .item-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .item-image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .item-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .item-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+    .item-title {
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .favorite-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text-muted);
+      transition: color var(--transition), transform var(--transition);
+    }
+    .favorite-btn.active {
+      color: #fbbf24;
+      transform: scale(1.05);
+    }
+    .item-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .item-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 2px;
+    }
+    .tag {
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .tag-strong {
+      border-color: var(--accent-soft);
+      color: var(--accent-soft);
+    }
+    .item-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      gap: 6px;
+    }
+    .item-footer-left {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .item-footer-right {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .status-select {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-alt);
+      color: var(--text);
+      font-size: 11px;
+      padding: 4px 8px;
+      outline: none;
+      cursor: pointer;
+    }
+    .link {
+      font-size: 11px;
+      color: var(--accent-soft);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .link:hover { text-decoration: underline; }
+    .delete-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 16px;
+      color: var(--danger);
+    }
+    .empty-state {
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 16px 8px;
+      text-align: center;
+    }
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: 100%;
+      max-width: 480px;
+      padding: 6px 10px 10px;
+      background: rgba(5,5,9,0.98);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(18px);
+    }
+    .bottom-nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 6px 4px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), transform var(--transition);
+    }
+    .nav-btn span.icon {
+      font-size: 18px;
+    }
+    .nav-btn.active {
+      background: #111827;
+      color: var(--accent-soft);
+      transform: translateY(-1px);
+    }
+    .nav-btn-add {
+      flex: 0;
+    }
+    .nav-btn-add-inner {
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      background: var(--accent-strong);
+      color: #050509;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.8);
+    }
+    .pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .pill-strong {
+      border-color: var(--accent-soft);
+      color: var(--accent-soft);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="app-title">Мій мобільний Wishlist</div>
+      <div class="app-subtitle">особистий інструмент для покупок і продажів</div>
+    </header>
+
+    <main id="screen-home" class="screen">
+      <div class="section-title">Головна</div>
+      <div class="section-sub">загальна картина по речах, статусах і категоріях</div>
+
+      <div class="grid-2" style="margin-bottom:10px;">
+        <div class="stat-card">
+          <div class="stat-label">Кросівки</div>
+          <div class="stat-value" id="stat-sneakers">0</div>
+          <div class="stat-pill">усі статуси</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Одяг</div>
+          <div class="stat-value" id="stat-clothes">0</div>
+          <div class="stat-pill">футболки, худі, джинси тощо</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Аксесуари</div>
+          <div class="stat-value" id="stat-accessories">0</div>
+          <div class="stat-pill">сумки, головні убори, інше</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Інші речі</div>
+          <div class="stat-value" id="stat-other">0</div>
+          <div class="stat-pill">все, що не вписалось</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:10px;">
+        <div class="stat-card">
+          <div class="stat-label">Хочу купити</div>
+          <div class="stat-value" id="stat-want">0</div>
+          <div class="stat-pill">плани покупок</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Замовлено</div>
+          <div class="stat-value" id="stat-ordered">0</div>
+          <div class="stat-pill">чекає на доставку</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Очікую / отримано</div>
+          <div class="stat-value" id="stat-received">0</div>
+          <div class="stat-pill">отримані речі</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Продажі</div>
+          <div class="stat-value" id="stat-sales">0</div>
+          <div class="stat-pill">виставлено / продано</div>
+        </div>
+      </div>
+
+      <div class="chips-row" style="margin-bottom:6px;">
+        <span class="pill" id="pill-favorites-count">Улюблені: 0</span>
+        <span class="pill pill-strong" id="pill-total-items">Усього речей: 0</span>
+      </div>
+
+      <div class="section-title" style="margin-top:10px;">Останні додані</div>
+      <div class="items-list" id="home-latest-list"></div>
+      <div class="empty-state" id="home-empty">Поки нічого немає. Додай першу річ.</div>
+    </main>
+
+    <main id="screen-categories" class="screen" style="display:none;">
+      <div class="section-title">Категорії</div>
+      <div class="section-sub">фільтри по категорії, сезону, розміру, ціні, статусу</div>
+
+      <div class="chips-row" id="category-chips"></div>
+      <div class="chips-row" id="season-chips"></div>
+
+      <div class="input-group">
+        <div class="input-row">
+          <input type="text" class="input" id="filter-size" placeholder="Розмір (42, M, L...)" />
+        </div>
+        <div class="input-row">
+          <input type="number" class="input" id="filter-price-min" placeholder="Мін. ціна" />
+          <input type="number" class="input" id="filter-price-max" placeholder="Макс. ціна" />
+        </div>
+        <div class="input-row">
+          <select class="input" id="filter-status">
+            <option value="all">Усі статуси</option>
+            <option value="want">Хочу купити</option>
+            <option value="saved">Збережено</option>
+            <option value="ordered">Замовлено</option>
+            <option value="received">Отримано</option>
+            <option value="sell">Продати</option>
+            <option value="listed">Виставлено</option>
+            <option value="sold">Продано</option>
+          </select>
+        </div>
+        <div class="input-row">
+          <input type="text" class="input" id="filter-search" placeholder="Пошук за назвою / брендом" />
+        </div>
+        <button class="btn btn-full btn-secondary" id="btn-clear-filters">Скинути фільтри</button>
+      </div>
+
+      <div class="items-list" id="categories-list"></div>
+      <div class="empty-state" id="categories-empty">Немає речей за цими фільтрами.</div>
+    </main>
+
+    <main id="screen-add" class="screen" style="display:none;">
+      <div class="section-title">Додати річ</div>
+      <div class="section-sub">мінімум кліків: вставляєш лінк — решта програма робить сама</div>
+
+      <div class="input-group">
+        <div class="input-label">Посилання на товар</div>
+        <div class="input-row">
+          <input type="url" class="input" id="input-link" placeholder="https://..." />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Назва (якщо треба змінити)</div>
+        <input type="text" class="input" id="input-title" placeholder="Назва товару" />
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Ціна та розмір</div>
+        <div class="input-row">
+          <input type="number" class="input" id="input-price" placeholder="Ціна" />
+          <input type="text" class="input" id="input-size" placeholder="Розмір (42, M...)" />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Категорія та сезон</div>
+        <div class="input-row">
+          <select class="input" id="input-category"></select>
+        </div>
+        <div class="input-row">
+          <select class="input" id="input-season">
+            <option value="all">Усі сезони</option>
+            <option value="spring">Весна</option>
+            <option value="summer">Літо</option>
+            <option value="autumn">Осінь</option>
+            <option value="winter">Зима</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Фото (якщо хочеш вручну)</div>
+        <input type="url" class="input" id="input-image" placeholder="Посилання на фото (необов'язково)" />
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Статус</div>
+        <select class="input" id="input-status">
+          <option value="want">Хочу купити</option>
+          <option value="saved">Збережено</option>
+          <option value="ordered">Замовлено</option>
+          <option value="received">Отримано</option>
+          <option value="sell">Продати</option>
+          <option value="listed">Виставлено</option>
+          <option value="sold">Продано</option>
+        </select>
+      </div>
+
+      <button class="btn btn-full" id="btn-add-item">+ Додати річ</button>
+
+      <div class="section-title" style="margin-top:16px;">Кошик / плани покупок</div>
+      <div class="section-sub">речі зі статусом «хочу купити»</div>
+      <div class="items-list" id="basket-list"></div>
+      <div class="empty-state" id="basket-empty">Поки немає планів покупок.</div>
+    </main>
+
+    <main id="screen-favorites" class="screen" style="display:none;">
+      <div class="section-title">Улюблені</div>
+      <div class="section-sub">речі, які ти лайкнув</div>
+      <div class="items-list" id="favorites-list"></div>
+      <div class="empty-state" id="favorites-empty">Ще немає улюблених речей.</div>
+    </main>
+
+    <main id="screen-sales" class="screen" style="display:none;">
+      <div class="section-title">Продажі</div>
+      <div class="section-sub">речі, які ти продаєш або плануєш продати</div>
+
+      <div class="input-group">
+        <div class="input-label">Нотатки для продажів (опціонально)</div>
+        <textarea class="input" id="sales-notes" rows="2" style="border-radius:12px;"></textarea>
+      </div>
+
+      <div class="items-list" id="sales-list"></div>
+      <div class="empty-state" id="sales-empty">Поки немає речей на продаж.</div>
+    </main>
+
+    <main id="screen-settings" class="screen" style="display:none;">
+      <div class="section-title">Налаштування</div>
+      <div class="section-sub">категорії, підкатегорії, резервні копії</div>
+
+      <div class="input-group">
+        <div class="input-label">Додати власну підкатегорію</div>
+        <div class="input-row">
+          <input type="text" class="input" id="input-custom-category" placeholder="Наприклад: Tech, Vintage..." />
+        </div>
+        <button class="btn btn-full btn-secondary" id="btn-add-custom-category">+ Додати підкатегорію</button>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Поточні категорії</div>
+        <div class="chips-row" id="settings-categories"></div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Резервна копія</div>
+        <button class="btn btn-full btn-secondary" id="btn-export-json">Експорт у JSON (копіюється в буфер)</button>
+      </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <div class="bottom-nav-inner">
+        <button class="nav-btn" data-screen="home" id="nav-home">
+          <span class="icon">🏠</span>
+          <span>Головна</span>
+        </button>
+        <button class="nav-btn" data-screen="categories" id="nav-categories">
+          <span class="icon">📂</span>
+          <span>Категорії</span>
+        </button>
+        <button class="nav-btn nav-btn-add" data-screen="add" id="nav-add">
+          <div class="nav-btn-add-inner">+</div>
+        </button>
+        <button class="nav-btn" data-screen="favorites" id="nav-favorites">
+          <span class="icon">⭐</span>
+          <span>Улюблені</span>
+        </button>
+        <button class="nav-btn" data-screen="sales" id="nav-sales">
+          <span class="icon">💸</span>
+          <span>Продажі</span>
+        </button>
+        <button class="nav-btn" data-screen="settings" id="nav-settings">
+          <span class="icon">⚙️</span>
+          <span>Налашт.</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    const STORAGE_KEY_ITEMS = "artem_mobile_wishlist_items_v1";
+    const STORAGE_KEY_NOTES = "artem_mobile_wishlist_sales_notes_v1";
+    const STORAGE_KEY_CATEGORIES = "artem_mobile_wishlist_categories_v1";
+
+    const BASE_CATEGORIES = [
+      "Кросівки",
+      "Футболки",
+      "Худі",
+      "Світшоти",
+      "Куртки",
+      "Штани",
+      "Джинси",
+      "Шорти",
+      "Сорочки",
+      "Білизна",
+      "Шкарпетки",
+      "Взуття",
+      "Аксесуари",
+      "Сумки",
+      "Головні убори",
+      "Інше"
+    ];
+
+    const STATUS_LABELS = {
+      want: "Хочу купити",
+      saved: "Збережено",
+      ordered: "Замовлено",
+      received: "Отримано",
+      sell: "Продати",
+      listed: "Виставлено",
+      sold: "Продано"
+    };
+
+    const SEASON_LABELS = {
+      all: "Усі сезони",
+      spring: "Весна",
+      summer: "Літо",
+      autumn: "Осінь",
+      winter: "Зима"
+    };
+
+    let items = [];
+    let customCategories = [];
+    let salesNotes = "";
+
+    let filters = {
+      category: "all",
+      season: "all",
+      size: "",
+      priceMin: "",
+      priceMax: "",
+      status: "all",
+      search: ""
+    };
+
+    const screens = {
+      home: document.getElementById("screen-home"),
+      categories: document.getElementById("screen-categories"),
+      add: document.getElementById("screen-add"),
+      favorites: document.getElementById("screen-favorites"),
+      sales: document.getElementById("screen-sales"),
+      settings: document.getElementById("screen-settings")
+    };
+
+    const navButtons = document.querySelectorAll(".nav-btn");
+
+    const statSneakersEl = document.getElementById("stat-sneakers");
+    const statClothesEl = document.getElementById("stat-clothes");
+    const statAccessoriesEl = document.getElementById("stat-accessories");
+    const statOtherEl = document.getElementById("stat-other");
+    const statWantEl = document.getElementById("stat-want");
+    const statOrderedEl = document.getElementById("stat-ordered");
+    const statReceivedEl = document.getElementById("stat-received");
+    const statSalesEl = document.getElementById("stat-sales");
+    const pillFavoritesCountEl = document.getElementById("pill-favorites-count");
+    const pillTotalItemsEl = document.getElementById("pill-total-items");
+
+    const homeLatestListEl = document.getElementById("home-latest-list");
+    const homeEmptyEl = document.getElementById("home-empty");
+
+    const categoryChipsEl = document.getElementById("category-chips");
+    const seasonChipsEl = document.getElementById("season-chips");
+    const categoriesListEl = document.getElementById("categories-list");
+    const categoriesEmptyEl = document.getElementById("categories-empty");
+
+    const filterSizeEl = document.getElementById("filter-size");
+    const filterPriceMinEl = document.getElementById("filter-price-min");
+    const filterPriceMaxEl = document.getElementById("filter-price-max");
+    const filterStatusEl = document.getElementById("filter-status");
+    const filterSearchEl = document.getElementById("filter-search");
+    const btnClearFiltersEl = document.getElementById("btn-clear-filters");
+
+    const inputLinkEl = document.getElementById("input-link");
+    const inputTitleEl = document.getElementById("input-title");
+    const inputPriceEl = document.getElementById("input-price");
+    const inputSizeEl = document.getElementById("input-size");
+    const inputCategoryEl = document.getElementById("input-category");
+    const inputSeasonEl = document.getElementById("input-season");
+    const inputImageEl = document.getElementById("input-image");
+    const inputStatusEl = document.getElementById("input-status");
+    const btnAddItemEl = document.getElementById("btn-add-item");
+
+    const basketListEl = document.getElementById("basket-list");
+    const basketEmptyEl = document.getElementById("basket-empty");
+
+    const favoritesListEl = document.getElementById("favorites-list");
+    const favoritesEmptyEl = document.getElementById("favorites-empty");
+
+    const salesListEl = document.getElementById("sales-list");
+    const salesEmptyEl = document.getElementById("sales-empty");
+    const salesNotesEl = document.getElementById("sales-notes");
+
+    const inputCustomCategoryEl = document.getElementById("input-custom-category");
+    const btnAddCustomCategoryEl = document.getElementById("btn-add-custom-category");
+    const settingsCategoriesEl = document.getElementById("settings-categories");
+    const btnExportJsonEl = document.getElementById("btn-export-json");
+
+    function loadData() {
+      try {
+        const rawItems = localStorage.getItem(STORAGE_KEY_ITEMS);
+        items = rawItems ? JSON.parse(rawItems) : [];
+      } catch {
+        items = [];
+      }
+      try {
+        const rawNotes = localStorage.getItem(STORAGE_KEY_NOTES);
+        salesNotes = rawNotes || "";
+      } catch {
+        salesNotes = "";
+      }
+      try {
+        const rawCats = localStorage.getItem(STORAGE_KEY_CATEGORIES);
+        customCategories = rawCats ? JSON.parse(rawCats) : [];
+      } catch {
+        customCategories = [];
+      }
+      salesNotesEl.value = salesNotes;
+    }
+
+    function saveItems() {
+      localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(items));
+    }
+
+    function saveNotes() {
+      localStorage.setItem(STORAGE_KEY_NOTES, salesNotes);
+    }
+
+    function saveCategories() {
+      localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(customCategories));
+    }
+
+    function getAllCategories() {
+      return [...BASE_CATEGORIES, ...customCategories];
+    }
+
+    function createItem(data) {
+      const id = Date.now().toString() + Math.random().toString(16).slice(2);
+      return {
+        id,
+        title: data.title || "Без назви",
+        price: data.price || null,
+        size: data.size || "",
+        link: data.link || "",
+        image: data.image || "",
+        category: data.category || "Інше",
+        season: data.season || "all",
+        status: data.status || "want",
+        favorite: false,
+        purchasePrice: data.purchasePrice || null,
+        salePrice: data.salePrice || null,
+        notes: data.notes || "",
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    function inferCategoryFromText(text) {
+      const t = text.toLowerCase();
+      const map = [
+        { key: "air max", cat: "Кросівки" },
+        { key: "air force", cat: "Кросівки" },
+        { key: "sneaker", cat: "Кросівки" },
+        { key: "кросів", cat: "Кросівки" },
+        { key: "кросс", cat: "Кросівки" },
+        { key: "nike", cat: "Кросівки" },
+        { key: "adidas", cat: "Кросівки" },
+        { key: "new balance", cat: "Кросівки" },
+        { key: "tee", cat: "Футболки" },
+        { key: "t-shirt", cat: "Футболки" },
+        { key: "футболк", cat: "Футболки" },
+        { key: "hoodie", cat: "Худі" },
+        { key: "худі", cat: "Худі" },
+        { key: "sweatshirt", cat: "Світшоти" },
+        { key: "світшот", cat: "Світшоти" },
+        { key: "jacket", cat: "Куртки" },
+        { key: "куртк", cat: "Куртки" },
+        { key: "coat", cat: "Куртки" },
+        { key: "pants", cat: "Штани" },
+        { key: "trousers", cat: "Штани" },
+        { key: "штани", cat: "Штани" },
+        { key: "jeans", cat: "Джинси" },
+        { key: "джинс", cat: "Джинси" },
+        { key: "shorts", cat: "Шорти" },
+        { key: "шорт", cat: "Шорти" },
+        { key: "shirt", cat: "Сорочки" },
+        { key: "сорочк", cat: "Сорочки" },
+        { key: "underwear", cat: "Білизна" },
+        { key: "білизн", cat: "Білизна" },
+        { key: "socks", cat: "Шкарпетки" },
+        { key: "sock", cat: "Шкарпетки" },
+        { key: "шкарпет", cat: "Шкарпетки" },
+        { key: "boot", cat: "Взуття" },
+        { key: "shoe", cat: "Взуття" },
+        { key: "черевик", cat: "Взуття" },
+        { key: "bag", cat: "Сумки" },
+        { key: "сумк", cat: "Сумки" },
+        { key: "cap", cat: "Головні убори" },
+        { key: "hat", cat: "Головні убори" },
+        { key: "beanie", cat: "Головні убори" },
+        { key: "кепк", cat: "Головні убори" },
+        { key: "шапк", cat: "Головні убори" },
+        { key: "belt", cat: "Аксесуари" },
+        { key: "watch", cat: "Аксесуари" },
+        { key: "bracelet", cat: "Аксесуари" },
+        { key: "аксесуар", cat: "Аксесуари" }
+      ];
+      for (const m of map) {
+        if (t.includes(m.key)) return m.cat;
+      }
+      return "Інше";
+    }
+
+    async function fetchOGImage(url) {
+      try {
+        const response = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(url));
+        const data = await response.json();
+        const html = data.contents;
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const ogImage = doc.querySelector('meta[property="og:image"]');
+        if (ogImage) return ogImage.getAttribute("content");
+      } catch (e) {
+        console.log("OG image fetch error:", e);
+      }
+      return "";
+    }
+
+    async function addItemFromForm() {
+      const link = inputLinkEl.value.trim();
+      const title = inputTitleEl.value.trim();
+      const price = inputPriceEl.value ? Number(inputPriceEl.value) : null;
+      const size = inputSizeEl.value.trim();
+      const status = inputStatusEl.value;
+      let category = inputCategoryEl.value;
+      const season = inputSeasonEl.value;
+      let image = inputImageEl.value.trim();
+
+      if (!link && !title) {
+        alert("Додай хоча б посилання або назву.");
+        return;
+      }
+
+      if (!category || category === "auto") {
+        const baseText = (title || "") + " " + (link || "");
+        category = inferCategoryFromText(baseText);
+      }
+
+      if (!image && link) {
+        image = await fetchOGImage(link);
+      }
+
+      const item = createItem({
+        link,
+        title: title || link,
+        price,
+        size,
+        category,
+        season,
+        image,
+        status
+      });
+
+      items.unshift(item);
+      saveItems();
+      clearAddForm();
+      renderAll();
+      switchScreen("home");
+    }
+
+    function clearAddForm() {
+      inputLinkEl.value = "";
+      inputTitleEl.value = "";
+      inputPriceEl.value = "";
+      inputSizeEl.value = "";
+      inputImageEl.value = "";
+      inputStatusEl.value = "want";
+      inputSeasonEl.value = "all";
+      inputCategoryEl.value = "auto";
+    }
+
+    function switchScreen(name) {
+      Object.entries(screens).forEach(([key, el]) => {
+        el.style.display = key === name ? "block" : "none";
+      });
+      navButtons.forEach(btn => {
+        const screen = btn.getAttribute("data-screen");
+        btn.classList.toggle("active", screen === name);
+      });
+    }
+
+    function toggleFavorite(id) {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+      item.favorite = !item.favorite;
+      saveItems();
+      renderAll();
+    }
+
+    function changeStatus(id, status) {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+      item.status = status;
+      saveItems();
+      renderAll();
+    }
+
+    function deleteItem(id) {
+      if (!confirm("Точно видалити цю річ?")) return;
+      items = items.filter(i => i.id !== id);
+      saveItems();
+      renderAll();
+    }
+
+    function updateFiltersFromInputs() {
+      filters.size = filterSizeEl.value.trim();
+      filters.priceMin = filterPriceMinEl.value;
+      filters.priceMax = filterPriceMaxEl.value;
+      filters.status = filterStatusEl.value;
+      filters.search = filterSearchEl.value.trim();
+      renderCategories();
+    }
+
+    function clearFilters() {
+      filters = {
+        category: "all",
+        season: "all",
+        size: "",
+        priceMin: "",
+        priceMax: "",
+        status: "all",
+        search: ""
+      };
+      filterSizeEl.value = "";
+      filterPriceMinEl.value = "";
+      filterPriceMaxEl.value = "";
+      filterStatusEl.value = "all";
+      filterSearchEl.value = "";
+      renderCategories();
+    }
+
+    function applyFilters(list) {
+      let result = [...list];
+
+      if (filters.category !== "all") {
+        result = result.filter(i => i.category === filters.category);
+      }
+      if (filters.season !== "all") {
+        result = result.filter(i => i.season === filters.season);
+      }
+      if (filters.status !== "all") {
+        result = result.filter(i => i.status === filters.status);
+      }
+      if (filters.size) {
+        const s = filters.size.toLowerCase();
+        result = result.filter(i => (i.size || "").toLowerCase().includes(s));
+      }
+      if (filters.priceMin) {
+        const min = Number(filters.priceMin);
+        result = result.filter(i => i.price == null || i.price >= min);
+      }
+      if (filters.priceMax) {
+        const max = Number(filters.priceMax);
+        result = result.filter(i => i.price == null || i.price <= max);
+      }
+      if (filters.search) {
+        const q = filters.search.toLowerCase();
+        result = result.filter(i => i.title.toLowerCase().includes(q));
+      }
+
+      return result;
+    }
+
+    function updateDashboardStats() {
+      const total = items.length;
+      pillTotalItemsEl.textContent = "Усього речей: " + total;
+
+      const favoritesCount = items.filter(i => i.favorite).length;
+      pillFavoritesCountEl.textContent = "Улюблені: " + favoritesCount;
+
+      const sneakers = items.filter(i => i.category === "Кросівки").length;
+      const clothes = items.filter(i =>
+        ["Футболки","Худі","Світшоти","Куртки","Штани","Джинси","Шорти","Сорочки","Білизна","Шкарпетки","Взуття"].includes(i.category)
+      ).length;
+      const accessories = items.filter(i =>
+        ["Аксесуари","Сумки","Головні убори"].includes(i.category)
+      ).length;
+      const other = items.filter(i => i.category === "Інше").length;
+
+      statSneakersEl.textContent = sneakers;
+      statClothesEl.textContent = clothes;
+      statAccessoriesEl.textContent = accessories;
+      statOtherEl.textContent = other;
+
+      const want = items.filter(i => i.status === "want").length;
+      const ordered = items.filter(i => i.status === "ordered").length;
+      const received = items.filter(i => i.status === "received").length;
+      const sales = items.filter(i => ["sell","listed","sold"].includes(i.status)).length;
+
+      statWantEl.textContent = want;
+      statOrderedEl.textContent = ordered;
+      statReceivedEl.textContent = received;
+      statSalesEl.textContent = sales;
+    }
+
+    function renderItemCard(item, container) {
+      const card = document.createElement("div");
+      card.className = "item-card";
+
+      const imgWrap = document.createElement("div");
+      imgWrap.className = "item-image";
+      if (item.image) {
+        const img = document.createElement("img");
+        img.src = item.image;
+        img.alt = item.title;
+        imgWrap.appendChild(img);
+      } else {
+        const placeholder = document.createElement("div");
+        placeholder.className = "item-image-placeholder";
+        placeholder.textContent = "немає фото";
+        imgWrap.appendChild(placeholder);
+      }
+
+      const body = document.createElement("div");
+      body.className = "item-body";
+
+      const titleRow = document.createElement("div");
+      titleRow.className = "item-title-row";
+
+      const titleEl = document.createElement("div");
+      titleEl.className = "item-title";
+      titleEl.textContent = item.title;
+
+      const favBtn = document.createElement("button");
+      favBtn.className = "favorite-btn" + (item.favorite ? " active" : "");
+      favBtn.innerHTML = item.favorite ? "★" : "☆";
+      favBtn.addEventListener("click", () => toggleFavorite(item.id));
+
+      titleRow.appendChild(titleEl);
+      titleRow.appendChild(favBtn);
+
+      const metaEl = document.createElement("div");
+      metaEl.className = "item-meta";
+      const parts = [];
+      if (item.price != null) parts.push(item.price + " ₴");
+      if (item.size) parts.push("розмір " + item.size);
+      parts.push(item.category);
+      if (item.season !== "all") parts.push(SEASON_LABELS[item.season]);
+      metaEl.textContent = parts.join(" • ");
+
+      const tagsEl = document.createElement("div");
+      tagsEl.className = "item-tags";
+
+      const statusTag = document.createElement("span");
+      statusTag.className = "tag tag-strong";
+      statusTag.textContent = STATUS_LABELS[item.status] || item.status;
+      tagsEl.appendChild(statusTag);
+
+      const createdTag = document.createElement("span");
+      createdTag.className = "tag";
+      const date = new Date(item.createdAt);
+      createdTag.textContent = "додано " + date.toLocaleDateString("uk-UA", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+      tagsEl.appendChild(createdTag);
+
+      body.appendChild(titleRow);
+      body.appendChild(metaEl);
+      body.appendChild(tagsEl);
+
+      const footer = document.createElement("div");
+      footer.className = "item-footer";
+
+      const footerLeft = document.createElement("div");
+      footerLeft.className = "item-footer-left";
+
+      const statusSelect = document.createElement("select");
+      statusSelect.className = "status-select";
+      Object.entries(STATUS_LABELS).forEach(([value, label]) => {
+        const opt = document.createElement("option");
+        opt.value = value;
+        opt.textContent = label;
+        if (value === item.status) opt.selected = true;
+        statusSelect.appendChild(opt);
+      });
+      statusSelect.addEventListener("change", e => changeStatus(item.id, e.target.value));
+      footerLeft.appendChild(statusSelect);
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "delete-btn";
+      deleteBtn.textContent = "✕";
+      deleteBtn.addEventListener("click", () => deleteItem(item.id));
+      footerLeft.appendChild(deleteBtn);
+
+      const footerRight = document.createElement("div");
+      footerRight.className = "item-footer-right";
+
+      if (item.link) {
+        const linkEl = document.createElement("a");
+        linkEl.className = "link";
+        linkEl.href = item.link;
+        linkEl.target = "_blank";
+        linkEl.rel = "noopener noreferrer";
+        linkEl.textContent = "Відкрити";
+        footerRight.appendChild(linkEl);
+      }
+
+      footer.appendChild(footerLeft);
+      footer.appendChild(footerRight);
+
+      card.appendChild(imgWrap);
+      card.appendChild(body);
+      card.appendChild(footer);
+
+      container.appendChild(card);
+    }
+
+    function renderHome() {
+      updateDashboardStats();
+      homeLatestListEl.innerHTML = "";
+      const latest = items.slice(0, 5);
+      if (latest.length === 0) {
+        homeEmptyEl.style.display = "block";
+      } else {
+        homeEmptyEl.style.display = "none";
+        latest.forEach(item => renderItemCard(item, homeLatestListEl));
+      }
+    }
+
+    function renderCategoriesChips() {
+      categoryChipsEl.innerHTML = "";
+      const allBtn = document.createElement("button");
+      allBtn.className = "chip" + (filters.category === "all" ? " active" : "");
+      allBtn.textContent = "Усі категорії";
+      allBtn.addEventListener("click", () => {
+        filters.category = "all";
+        renderCategories();
+      });
+      categoryChipsEl.appendChild(allBtn);
+
+      getAllCategories().forEach(cat => {
+        const btn = document.createElement("button");
+        btn.className = "chip chip-outline" + (filters.category === cat ? " active" : "");
+        btn.textContent = cat;
+        btn.addEventListener("click", () => {
+          filters.category = cat;
+          renderCategories();
+        });
+        categoryChipsEl.appendChild(btn);
+      });
+
+      seasonChipsEl.innerHTML = "";
+      Object.entries(SEASON_LABELS).forEach(([value, label]) => {
+        const btn = document.createElement("button");
+        btn.className = "chip chip-outline" + (filters.season === value ? " active" : "");
+        btn.textContent = label;
+        btn.addEventListener("click", () => {
+          filters.season = value;
+          renderCategories();
+        });
+        seasonChipsEl.appendChild(btn);
+      });
+    }
+
+    function renderCategories() {
+      renderCategoriesChips();
+      categoriesListEl.innerHTML = "";
+      const filtered = applyFilters(items);
+      if (filtered.length === 0) {
+        categoriesEmptyEl.style.display = "block";
+      } else {
+        categoriesEmptyEl.style.display = "none";
+        filtered.forEach(item => renderItemCard(item, categoriesListEl));
+      }
+    }
+
+    function renderBasket() {
+      basketListEl.innerHTML = "";
+      const basketItems = items.filter(i => i.status === "want");
+      if (basketItems.length === 0) {
+        basketEmptyEl.style.display = "block";
+      } else {
+        basketEmptyEl.style.display = "none";
+        basketItems.forEach(item => renderItemCard(item, basketListEl));
+      }
+    }
+
+    function renderFavorites() {
+      favoritesListEl.innerHTML = "";
+      const favItems = items.filter(i => i.favorite);
+      if (favItems.length === 0) {
+        favoritesEmptyEl.style.display = "block";
+      } else {
+        favoritesEmptyEl.style.display = "none";
+        favItems.forEach(item => renderItemCard(item, favoritesListEl));
+      }
+    }
+
+    function renderSales() {
+      salesListEl.innerHTML = "";
+      const salesItems = items.filter(i => ["sell","listed","sold"].includes(i.status));
+      if (salesItems.length === 0) {
+        salesEmptyEl.style.display = "block";
+      } else {
+        salesEmptyEl.style.display = "none";
+        salesItems.forEach(item => renderItemCard(item, salesListEl));
+      }
+    }
+
+    function renderSettings() {
+      settingsCategoriesEl.innerHTML = "";
+      getAllCategories().forEach(cat => {
+        const span = document.createElement("span");
+        span.className = "pill";
+        span.textContent = cat;
+        settingsCategoriesEl.appendChild(span);
+      });
+
+      inputCategoryEl.innerHTML = "";
+      const autoOpt = document.createElement("option");
+      autoOpt.value = "auto";
+      autoOpt.textContent = "Авто (визначити за лінком)";
+      inputCategoryEl.appendChild(autoOpt);
+
+      getAllCategories().forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        inputCategoryEl.appendChild(opt);
+      });
+      inputCategoryEl.value = "auto";
+    }
+
+    function renderAll() {
+      renderHome();
+      renderCategories();
+      renderBasket();
+      renderFavorites();
+      renderSales();
+      renderSettings();
+    }
+
+    function initEvents() {
+      navButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const screen = btn.getAttribute("data-screen");
+          switchScreen(screen);
+        });
+      });
+
+      btnAddItemEl.addEventListener("click", addItemFromForm);
+      inputLinkEl.addEventListener("keydown", e => {
+        if (e.key === "Enter") addItemFromForm();
+      });
+      inputTitleEl.addEventListener("keydown", e => {
+        if (e.key === "Enter") addItemFromForm();
+      });
+
+      filterSizeEl.addEventListener("input", updateFiltersFromInputs);
+      filterPriceMinEl.addEventListener("input", updateFiltersFromInputs);
+      filterPriceMaxEl.addEventListener("input", updateFiltersFromInputs);
+      filterStatusEl.addEventListener("change", updateFiltersFromInputs);
+      filterSearchEl.addEventListener("input", updateFiltersFromInputs);
+      btnClearFiltersEl.addEventListener("click", clearFilters);
+
+      salesNotesEl.addEventListener("input", () => {
+        salesNotes = salesNotesEl.value;
+        saveNotes();
+      });
+
+      btnAddCustomCategoryEl.addEventListener("click", () => {
+        const name = inputCustomCategoryEl.value.trim();
+        if (!name) return;
+        if (!customCategories.includes(name) && !BASE_CATEGORIES.includes(name)) {
+          customCategories.push(name);
+          saveCategories();
+          inputCustomCategoryEl.value = "";
+          renderAll();
+        }
+      });
+
+      btnExportJsonEl.addEventListener("click", () => {
+        const json = JSON.stringify({ items, customCategories, salesNotes }, null, 2);
+        navigator.clipboard.writeText(json)
+          .then(() => alert("JSON скопійовано в буфер обміну."))
+          .catch(() => alert("Не вдалося скопіювати. Ось JSON:\n\n" + json));
+      });
+    }
+
+    function bootstrap() {
+      loadData();
+      initEvents();
+      renderAll();
+      switchScreen("home");
+    }
+
+    bootstrap();
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js");
+    }
+  </script>
+</body>
+</html>
 
